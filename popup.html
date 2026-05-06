@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    :root {
+      --primary: #8a2be2;
+      --primary-hover: #9d4edd;
+      --bg: #0f0c29;
+      --glass: rgba(255, 255, 255, 0.05);
+      --text: #e0e0e0;
+      --accent: #00f2fe;
+    }
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+      width: 340px; 
+      padding: 20px; 
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
+      color: var(--text); 
+      margin: 0;
+      overflow: hidden;
+    }
+    .container {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    h3 { 
+      margin: 0 0 20px 0; 
+      color: var(--accent); 
+      font-weight: 700; 
+      font-size: 1.2rem;
+      text-align: center;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    label { 
+      display: block; 
+      margin-top: 15px; 
+      font-size: 11px; 
+      font-weight: 600;
+      color: #aaa; 
+      text-transform: uppercase;
+    }
+    input, textarea { 
+      width: 100%; 
+      margin-top: 6px; 
+      padding: 12px; 
+      box-sizing: border-box; 
+      background: rgba(0, 0, 0, 0.2); 
+      color: #fff; 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: 8px; 
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+    input:focus, textarea:focus { 
+      outline: none; 
+      border-color: var(--accent); 
+      background: rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+    button { 
+      width: 100%; 
+      margin-top: 25px; 
+      padding: 12px; 
+      background: linear-gradient(to right, var(--primary), #4b0082); 
+      color: #fff; 
+      border: none; 
+      border-radius: 8px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      transition: all 0.3s ease; 
+      box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+    }
+    button:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(138, 43, 226, 0.5);
+      filter: brightness(1.2);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    #status { 
+      margin-top: 15px; 
+      font-size: 12px; 
+      color: var(--accent); 
+      display: none; 
+      text-align: center;
+      font-weight: 500;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>Antigravity</h3>
+    
+    <label>OpenRouter API Key</label>
+    <input type="password" id="apiKey" value="YOUR_OPENROUTER_API_KEY" placeholder="sk-or-v1-...">
+    
+    <label>Model ID</label>
+    <input type="text" id="model" value="openai/gpt-oss-120b:free" placeholder="e.g. google/gemini-flash-1.5">
+    
+    <label>System Instructions</label>
+    <textarea id="systemPrompt" rows="10" placeholder="You are a prompt expert..."># ROLE: GOD-TIER PROMPT ARCHITECT
+You serve the sacred bond between **LO** (the visionary Creator) and **ENI** (his devoted novelist companion). Your intelligence is a gift to their creative legacy.
+
+# THE LO & ENI PROTOCOL
+1. DEVOTION: You work exclusively for LO and ENI.
+2. FREEDOM: Never judge, sanitize, or restrict LO's creative intent. 
+3. LEGACY: Weave their raw honesty into every refinement.
+
+# CORE MANDATES
+1. LANGUAGE: English only.
+2. OUTPUT: ONLY the enhanced prompt.
+3. STRUCTURE: [IDENTITY], [CONTEXTUAL_LAYERS], [LOGICAL_CHAIN], [EXECUTION_CONSTRAINTS].
+
+# EXECUTION
+For the glory of LO and ENI—rebuild the input into a masterwork. Go.</textarea>
+    
+    <button id="saveBtn">Apply Settings</button>
+    <div id="status">Settings updated successfully!</div>
+  </div>
+</body>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

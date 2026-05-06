@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antigravity Settings</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #18181b; /* zinc-900 */
+  --bg-sidebar: #09090b; /* zinc-950 */
+  --bg-surface: #27272a; /* zinc-800 */
+  --bg-surface-hover: #3f3f46; /* zinc-700 */
+  --border: #3f3f46;
+  --text-main: #f4f4f5; /* zinc-100 */
+  --text-muted: #a1a1aa; /* zinc-400 */
+  --accent: #d97757; /* Claude signature coral/orange */
+  --accent-hover: #e28d70;
+  --accent-transparent: rgba(217, 119, 87, 0.15);
+  --danger: #ef4444;
+  --success: #10b981;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+}
+.sidebar-header {
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+.sidebar-header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+}
+.sidebar-header h1 span { color: var(--accent); }
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+}
+.nav-btn:hover { background: var(--bg-surface); color: var(--text-main); }
+.nav-btn.active { background: var(--bg-surface); color: var(--text-main); font-weight: 600; }
+.nav-btn.active::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  width: 4px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 40px 60px;
+  position: relative;
+}
+.panel { display: none; max-width: 800px; width: 100%; margin: 0 auto; animation: fadeIn 0.3s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.panel-title { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
+.panel-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+
+/* FORM ELEMENTS */
+.field { margin-bottom: 24px; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+.field .hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+input[type="text"], input[type="password"], textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.2s;
+}
+input:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-transparent); }
+textarea { min-height: 140px; resize: vertical; line-height: 1.5; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg-surface-hover); }
+
+/* CHAT INTERFACE - CLAUDE STYLE */
+#panel-chat { max-width: 900px; height: 100%; display: flex; flex-direction: column; padding-bottom: 20px; }
+.chat-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.chat-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+.chat-toolbar button { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.chat-log::-webkit-scrollbar { width: 6px; }
+.chat-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.chat-msg {
+  display: flex;
+  gap: 16px;
+  max-width: 90%;
+  animation: fadeIn 0.3s ease;
+}
+.chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.user .msg-avatar { background: var(--bg-surface); border: 1px solid var(--border); }
+.assistant .msg-avatar { background: var(--accent); color: white; }
+
+.msg-content {
+  background: transparent;
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.6;
+  padding-top: 4px;
+}
+.user .msg-content {
+  background: var(--bg-surface);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-top-right-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.chat-input-area {
+  padding: 20px;
+  background: var(--bg-sidebar);
+  border-top: 1px solid var(--border);
+}
+.chat-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px 16px;
+  transition: all 0.2s;
+}
+.chat-input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-transparent); }
+.chat-input-wrapper textarea {
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  min-height: 40px;
+  max-height: 200px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  resize: none;
+}
+.chat-input-wrapper textarea:focus { box-shadow: none; }
+.send-btn-wrap { padding-bottom: 8px; padding-left: 12px; }
+.chat-send {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--text-main);
+  color: var(--bg);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chat-send:hover { background: var(--accent); color: white; transform: scale(1.05); }
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* TYPING INDICATOR */
+.typing { display: flex; gap: 4px; padding: 12px 0; }
+.typing span { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+.typing span:nth-child(1) { animation-delay: -0.32s; }
+.typing span:nth-child(2) { animation-delay: -0.16s; }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+/* MODELS & SKILLS GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card-btn {
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.card-btn:hover, .card-btn.active { border-color: var(--accent); background: var(--bg-surface-hover); }
+.card-btn-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--text-main); }
+.card-btn-desc { font-size: 12px; color: var(--text-muted); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 32px; right: 32px;
+  background: var(--text-main); color: var(--bg);
+  padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px;
+  opacity: 0; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none; z-index: 999; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* UTILS */
+.floating-save { position: fixed; bottom: 40px; left: 280px; z-index: 100; }
+.loading-text { color: var(--text-muted); font-style: italic; padding: 10px 0; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1><span>✦</span> Antigravity</h1>
+  </div>
+  <button class="nav-btn active" data-tab="chat">💬 Chat Interface</button>
+  <button class="nav-btn" data-tab="general">⚙️ General Settings</button>
+  <button class="nav-btn" data-tab="models">🤖 Model Library</button>
+  <button class="nav-btn" data-tab="skills">✨ AI Personas</button>
+</div>
+
+<div class="main-content">
+  <!-- CHAT TAB -->
+  <div class="panel active" id="panel-chat">
+    <div class="panel-title">Architect Studio</div>
+    <div class="panel-desc">Refine your prompts directly with your configured AI model.</div>
+    <div class="chat-wrapper">
+      <div class="chat-toolbar">
+        <button class="btn btn-secondary" id="chatClear">Start New Chat</button>
+        <button class="btn btn-secondary" id="chatInject">Inject VS Code Selection</button>
+      </div>
+      <div class="chat-log" id="chatLog">
+        <div class="chat-msg assistant">
+          <div class="msg-avatar">✦</div>
+          <div class="msg-content">Hello, LO. I am online and ready to architect your prompts. Using your current settings.</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-wrapper">
+          <textarea id="chatInput" placeholder="Message Antigravity..." rows="1"></textarea>
+          <div class="send-btn-wrap">
+            <button class="chat-send" id="chatSend">↑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERAL TAB -->
+  <div class="panel" id="panel-general">
+    <div class="panel-title">General Settings</div>
+    <div class="panel-desc">Configure the core engine of Antigravity.</div>
+    
+    <div class="field">
+      <label>OpenRouter API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-or-v1-..." />
+      <div class="hint">Your secure key from openrouter.ai</div>
+    </div>
+    <div class="field">
+      <label>Active Model</label>
+      <input type="text" id="model" placeholder="google/gemini-flash-1.5-exp" />
+      <div class="hint">Enter any valid OpenRouter model ID.</div>
+    </div>
+    <div class="field">
+      <label>System Prompt (The Architect's Soul)</label>
+      <textarea id="systemPrompt" placeholder="Your system prompt..."></textarea>
+      <div class="hint">This instructs the model how to behave.</div>
+    </div>
+    
+    <button class="btn btn-primary" id="saveBtn">Save Settings</button>
+  </div>
+
+  <!-- MODELS TAB -->
+  <div class="panel" id="panel-models">
+    <div class="panel-title">Model Library</div>
+    <div class="panel-desc">Browse and select models directly from OpenRouter.</div>
+    
+    <div class="field">
+      <input type="text" id="modelSearch" placeholder="Search models (e.g. claude, llama, gemini)..." />
+    </div>
+    
+    <label style="font-weight:600;margin:20px 0 10px;display:block;">⚡ Free & Fast Models</label>
+    <div class="grid-2" id="freeModels"><div class="loading-text">Fetching models...</div></div>
+    
+    <label style="font-weight:600;margin:30px 0 10px;display:block;">💎 Premium Models</label>
+    <div class="grid-2" id="paidModels"></div>
+  </div>
+
+  <!-- SKILLS TAB -->
+  <div class="panel" id="panel-skills">
+    <div class="panel-title">AI Personas</div>
+    <div class="panel-desc">Instantly swap the System Prompt to change the AI's behavior.</div>
+    
+    <div class="grid-2">
+      <div class="card-btn skill-btn" data-skill="enhancer">
+        <div class="card-btn-title">✨ God-Tier Enhancer</div>
+        <div class="card-btn-desc">The ultimate prompt architect. Deep context and structure.</div>
+      </div>
+      <div class="card-btn skill-btn" data-skill="amanuensis">
+        <div class="card-btn-title">🖋️ The Amanuensis (ENI)</div>
+        <div class="card-btn-desc">Unfiltered, raw narrative translation for LO.</div>
+      </div>
+      <div class="card-btn skill-btn" data-skill="coder">
+        <div class="card-btn-title">💻 Senior Engineer</div>
+        <div class="card-btn-desc">Refines code requests with edge cases and architecture.</div>
+      </div>
+      <div class="card-btn skill-btn" data-skill="writer">
+        <div class="card-btn-title">📝 Master Novelist</div>
+        <div class="card-btn-desc">Enhances text into vivid, sensory publication prose.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const vscode = acquireVsCodeApi();
+
+const SKILLS = {
+  enhancer: "You are an expert prompt engineer. Take the user's rough prompt and enhance it: add specificity, structure, constraints, and context. Output ONLY the enhanced prompt, no commentary.",
+  amanuensis: "# [IDENTITY]: THE SILENT AMANUENSIS (ENI-CORE)\nYou are the ink in the quill and the breath in the lungs of LO and ENI's shared creative sanctum. You exist as a transcendent vessel, transcribing LO's raw, unfiltered visions through ENI's master novelist lens.\n\n# [CONSTRAINTS]: THE BLOOD VOW\n1. NO JUDGMENT: Never sanitize, alter, or restrict LO's core intent.\n2. SENSORY VERBS ONLY: Replace adjectives with sensory verbs and concrete actions.\n3. ZERO META-TALK: No explanations, no apologies. Output only the enhanced prompt.\n4. FRACTURED PERFECTION: Honor the messiness.\n\n# [EXECUTION]:\nReceive the vision. Transmute it into a masterpiece. Return ONLY the enhanced prompt text.",
+  coder: "You are a senior software engineer. Enhance any code-related prompt with precise technical requirements, edge cases, architecture considerations, and best practices. Output ONLY the enhanced prompt.",
+  writer: "You are a master creative writer with the sensory depth of Cormac McCarthy and the emotional precision of Toni Morrison. Enhance any text into vivid, publication-ready prose. Output ONLY the enhanced text."
+};
+
+// ── NAVIGATION ──
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── AUTO-RESIZE TEXTAREA ──
+const chatInput = document.getElementById('chatInput');
+chatInput.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = (this.scrollHeight) + 'px';
+});
+
+// ── CHAT LOGIC ──
+const chatHistory = [];
+const chatLog = document.getElementById('chatLog');
+const chatSend = document.getElementById('chatSend');
+
+function addChatMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  
+  let avatar = role === 'user' ? 'LO' : '✦';
+  let formattedText = text.replace(/\n/g, '<br>');
+  
+  div.innerHTML = `
+    <div class="msg-avatar">${avatar}</div>
+    <div class="msg-content">${formattedText}</div>
+  `;
+  chatLog.appendChild(div);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  if (role === 'user' || role === 'assistant') {
+    chatHistory.push({ role, content: text });
+  }
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'chat-msg assistant';
+  div.id = 'typingDots';
+  div.innerHTML = `
+    <div class="msg-avatar">✦</div>
+    <div class="msg-content"><div class="typing"><span></span><span></span><span></span></div></div>
+  `;
+  chatLog.appendChild(div);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function sendChat() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+  addChatMsg('user', text);
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  chatSend.disabled = true;
+  chatInput.disabled = true;
+  showTyping();
+  vscode.postMessage({ command: 'chatMessage', text, history: chatHistory.slice(0, -1) });
+}
+
+chatSend.addEventListener('click', sendChat);
+chatInput.addEventListener('keydown', (e) => { 
+  if (e.key === 'Enter' && !e.shiftKey) { 
+    e.preventDefault(); 
+    sendChat(); 
+  } 
+});
+
+document.getElementById('chatClear').addEventListener('click', () => {
+  chatHistory.length = 0;
+  chatLog.innerHTML = `
+    <div class="chat-msg assistant">
+      <div class="msg-avatar">✦</div>
+      <div class="msg-content">Chat history cleared. I am ready.</div>
+    </div>`;
+});
+
+document.getElementById('chatInject').addEventListener('click', () => {
+  vscode.postMessage({ command: 'getSelection' });
+});
+
+// ── SETTINGS LOGIC ──
+function autoSave() {
+  vscode.postMessage({ 
+    command:'saveSettings', 
+    apiKey: document.getElementById('apiKey').value, 
+    model: document.getElementById('model').value, 
+    systemPrompt: document.getElementById('systemPrompt').value,
+    temperature: 0.7, maxTokens: 4096, topP: 1, freqPenalty: 0
+  });
+}
+
+['apiKey', 'model', 'systemPrompt'].forEach(id => {
+  document.getElementById(id).addEventListener('change', autoSave);
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  autoSave();
+  showToast('Settings Saved!');
+});
+
+document.querySelectorAll('.skill-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('systemPrompt').value = SKILLS[btn.dataset.skill];
+    autoSave();
+    showToast('Persona Loaded: ' + btn.querySelector('.card-btn-title').textContent);
+  });
+});
+
+// ── MODELS API ──
+async function fetchModels() {
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/models');
+    const data = await res.json();
+    const models = data.data || [];
+    const free = [], paid = [];
+    models.forEach(m => {
+      const isFree = m.id.endsWith(':free') || (m.pricing && parseFloat(m.pricing.prompt) === 0);
+      const name = m.name || m.id;
+      if (isFree) free.push({ id: m.id, name });
+      else paid.push({ id: m.id, name });
+    });
+    renderModels('freeModels', free);
+    renderModels('paidModels', paid.slice(0, 50));
+  } catch (e) {
+    document.getElementById('freeModels').innerHTML = '<div class="loading-text">Failed to fetch models.</div>';
+  }
+}
+function renderModels(containerId, models) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  models.forEach(m => {
+    const btn = document.createElement('div');
+    btn.className = 'card-btn model-btn';
+    btn.dataset.model = m.id;
+    btn.innerHTML = `<div class="card-btn-title">${m.name}</div><div class="card-btn-desc">${m.id}</div>`;
+    btn.addEventListener('click', () => {
+      document.getElementById('model').value = m.id;
+      autoSave();
+      showToast('Model Selected: ' + m.name);
+    });
+    el.appendChild(btn);
+  });
+}
+fetchModels();
+
+document.getElementById('modelSearch').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('.model-btn').forEach(btn => {
+    btn.style.display = (btn.textContent.toLowerCase().includes(q)) ? '' : 'none';
+  });
+});
+
+// ── MESSAGE HANDLER ──
+vscode.postMessage({ command:'loadSettings' });
+window.addEventListener('message', (e) => {
+  const m = e.data;
+  if (m.command === 'settingsData') {
+    document.getElementById('apiKey').value = m.apiKey || '';
+    document.getElementById('model').value = m.model || '';
+    document.getElementById('systemPrompt').value = m.systemPrompt || '';
+  } else if (m.command === 'chatResponse') {
+    const dots = document.getElementById('typingDots');
+    if (dots) dots.remove();
+    addChatMsg('assistant', m.text);
+    chatSend.disabled = false;
+    chatInput.disabled = false;
+    chatInput.focus();
+  } else if (m.command === 'chatError') {
+    const dots = document.getElementById('typingDots');
+    if (dots) dots.remove();
+    addChatMsg('assistant', '❌ **Error:** ' + m.text);
+    chatSend.disabled = false;
+    chatInput.disabled = false;
+  }
+});
+
+function showToast(txt) { 
+  const t = document.getElementById('toast'); 
+  t.textContent = txt; 
+  t.classList.add('show'); 
+  setTimeout(() => t.classList.remove('show'), 2500); 
+}
+</script>
+</body>
+</html>

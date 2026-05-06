@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Antigravity Prompt Enhancer",
+  "version": "1.0",
+  "description": "Enhances prompts via OpenRouter API and auto-overwrites in Antigravity.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://openrouter.ai/api/*",
+    "https://gemini.google.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

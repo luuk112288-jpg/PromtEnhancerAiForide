@@ -1,0 +1,117 @@
+{
+  "name": "antigravity-prompt-enhancer",
+  "displayName": "Antigravity Prompt Enhancer",
+  "description": "Enhances prompts via OpenRouter API directly in VS Code.",
+  "version": "3.1.0",
+  "publisher": "LO",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LO/antigravity-prompt-enhancer.git"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "antigravity-prompt-enhancer.enhanceClipboard",
+        "title": "Antigravity: Enhance Clipboard"
+      },
+      {
+        "command": "antigravity-prompt-enhancer.enhanceWithContext",
+        "title": "Antigravity: Enhance with Context"
+      },
+      {
+        "command": "antigravity-prompt-enhancer.enhanceSelection",
+        "title": "Antigravity: Enhance Selection"
+      },
+      {
+        "command": "antigravity-prompt-enhancer.openSettingsUI",
+        "title": "Antigravity: Open Settings"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "antigravity-prompt-enhancer.enhanceWithContext",
+        "key": "ctrl+alt+e",
+        "mac": "cmd+alt+e"
+      },
+      {
+        "command": "antigravity-prompt-enhancer.enhanceSelection",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s"
+      },
+      {
+        "command": "antigravity-prompt-enhancer.openSettingsUI",
+        "key": "ctrl+alt+,",
+        "mac": "cmd+alt+,"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "antigravity-prompt-enhancer.enhanceSelection",
+          "group": "modification",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "antigravity-prompt-enhancer.openSettingsUI",
+          "group": "modification"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Antigravity Prompt Enhancer",
+      "properties": {
+        "antigravityEnhancer.openRouterApiKey": {
+          "type": "string",
+          "default": "YOUR_OPENROUTER_API_KEY",
+          "description": "Your OpenRouter API Key"
+        },
+        "antigravityEnhancer.model": {
+          "type": "string",
+          "default": "tencent/hy3-preview:free",
+          "description": "OpenRouter model ID"
+        },
+        "antigravityEnhancer.systemPrompt": {
+          "type": "string",
+          "default": "You are an expert prompt engineer. Take the user's rough prompt and enhance it: add specificity, structure, constraints, and context. Output ONLY the enhanced prompt, no commentary.",
+          "description": "System prompt sent to the model"
+        },
+        "antigravityEnhancer.temperature": {
+          "type": "number",
+          "default": 0.7,
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Sampling temperature (0=deterministic, 2=max creativity)"
+        },
+        "antigravityEnhancer.maxTokens": {
+          "type": "integer",
+          "default": 4096,
+          "minimum": 256,
+          "maximum": 16384,
+          "description": "Maximum output tokens"
+        },
+        "antigravityEnhancer.topP": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Top P (nucleus sampling)"
+        },
+        "antigravityEnhancer.frequencyPenalty": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Frequency penalty to reduce repetition"
+        }
+      }
+    }
+  }
+}
